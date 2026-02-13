@@ -1,0 +1,33 @@
+--- Enum library for creating immutable enumerations.
+--- Supports sequential enums and bitflag enums.
+---
+--- Usage:
+---   DataState = Enum { "OLD_DATA", "NEW_DATA" }
+---   -- DataState.OLD_DATA = 0, DataState.NEW_DATA = 1
+---
+---   PlayerFlags = Enum.Flags { "TELEPORT_USED", "SOME_FLAG" }
+---   -- PlayerFlags.TELEPORT_USED = 1, PlayerFlags.SOME_FLAG = 2
+
+local function freeze(t)
+    return setmetatable(t, {
+        __newindex = function() error("Cannot modify enum") end
+    })
+end
+
+_G.Enum = setmetatable({
+    Flags = function(values)
+        local result = {}
+        for i, name in ipairs(values) do
+            result[name] = bit.lshift(1, i - 1)
+        end
+        return freeze(result)
+    end
+}, {
+    __call = function(self, values)
+        local result = {}
+        for i, name in ipairs(values) do
+            result[name] = i - 1
+        end
+        return freeze(result)
+    end
+})

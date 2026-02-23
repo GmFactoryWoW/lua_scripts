@@ -26,7 +26,7 @@ StartTeleportConstant = {
     SHARED_SPAWNS: { [7]: 3, [8]: 2 },
 
     QUERY: {
-        SELECT: "SELECT `race`, `map`, `position_x`, `position_y`, `position_z`, `orientation` FROM `playercreateinfo` WHERE `class` = 1 || `class` = 2 GROUP BY `race`;"
+        SELECT: "SELECT DISTINCT `race`, `map`, `position_x`, `position_y`, `position_z`, `orientation` FROM `playercreateinfo` WHERE `class` != 6;"
     }
 
     NPC_ENTRY: { ALLIANCE: 197, HORDE: 10176 }

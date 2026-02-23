@@ -1,22 +1,22 @@
 --[[
     mediator.lua
-    
+
     A lightweight mediator pattern implementation with:
     - Singleton pattern for global access
     - Named parameters for improved readability
     - Multiple return values with default fallbacks
-    
+
     @module Mediator
     @author iThorgrim
     @license AGL v3
     @version 2.0
 ]]
 
-local Object = Object or require("classic")
+local Classic = Classic or require("classic")
 
 ---@class Mediator
 ---@field private events table<string, table> Registered callbacks by event name
-local Mediator = Object:extend()
+local Mediator = Classic:extend()
 
 -- Singleton instance
 local Instance = nil

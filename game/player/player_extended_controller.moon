@@ -18,8 +18,7 @@ OnPlayerLogin = (event, player) ->
         return unless pobject
 
         pobject\SetData "PlayerExtended", player_extended
-        Mediator\publish "player:ready", pobject
-
+        Mediator\On "player:ready", pobject
 RegisterPlayerEvent 3, OnPlayerLogin
 
 --- Saves PlayerExtended data and cleans up on player logout.
@@ -27,7 +26,7 @@ RegisterPlayerEvent 3, OnPlayerLogin
 --- @param event number Event ID (4 = PLAYER_EVENT_ON_LOGOUT)
 --- @param player Player The player logging out
 OnPlayerLogout = (event, player) ->
-    Mediator\publish "player:logout", player
+    Mediator\On "player:logout", player
     ext = player\GetData "PlayerExtended"
     if ext
         ext\Save!

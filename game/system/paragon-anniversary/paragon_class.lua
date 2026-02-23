@@ -32,7 +32,8 @@
 local Repository = require("paragon_repository")
 local Config = require("paragon_config")
 
-local Paragon = Object:extend()
+local Classic = Classic or require("classic")
+local Paragon = Classic:extend()
 
 -- Global Mediator is available (initialized before this module loads)
 -- Used for triggering paragon state change events

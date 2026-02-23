@@ -23,7 +23,8 @@
 
 local Repository = require("paragon_repository")
 
-local Config = Object:extend()
+local Classic = Classic or require("classic")
+local Config = Classic:extend()
 local Instance = nil
 
 -- ============================================================================

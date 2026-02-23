@@ -76,7 +76,7 @@ local function OnParagonLevelChanged(player, _, old_level, new_level)
 end
 
 -- Register for Paragon level change events
-RegisterMediatorEvent("OnParagonLevelChanged", OnParagonLevelChanged)
+Mediator.Register("OnParagonLevelChanged", OnParagonLevelChanged)
 
 -- ============================================================================
 -- MODULE INITIALIZATION

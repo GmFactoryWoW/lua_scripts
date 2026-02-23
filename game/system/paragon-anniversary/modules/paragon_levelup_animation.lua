@@ -52,7 +52,7 @@ local function OnAfterMigrationExecute(_)
 end
 
 -- Register for deferred migration event
-RegisterMediatorEvent("OnAfterMigrationExecute", OnAfterMigrationExecute)
+Mediator.Register("OnAfterMigrationExecute", OnAfterMigrationExecute)
 
 -- ============================================================================
 -- ANIMATION HANDLERS
@@ -108,7 +108,7 @@ local function OnParagonLevelChanged(player, _, old_level, new_level)
 end
 
 -- Register for level change events
-RegisterMediatorEvent("OnParagonLevelChanged", OnParagonLevelChanged)
+Mediator.Register("OnParagonLevelChanged", OnParagonLevelChanged)
 
 -- ============================================================================
 -- MODULE INITIALIZATION

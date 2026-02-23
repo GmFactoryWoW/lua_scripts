@@ -234,7 +234,7 @@ end
 --- Core required hook: Processes experience gains with cascading level-ups.
 --- This is mandatory for paragon system functionality.
 ---
-RegisterMediatorEvent("OnUpdatePlayerExperience", OnUpdatePlayerExperience)
+Mediator.Register("OnUpdatePlayerExperience", OnUpdatePlayerExperience)
 
 ---
 --- Optional hooks: Extend paragon behavior via Mediator without modifying core hooks.
@@ -242,9 +242,9 @@ RegisterMediatorEvent("OnUpdatePlayerExperience", OnUpdatePlayerExperience)
 ---
 
 -- Experience modifier: Adjusts XP based on player conditions
-RegisterMediatorEvent("OnExperienceCalculated", OnExperienceCalculated)
+Mediator.Register("OnExperienceCalculated", OnExperienceCalculated)
 
 -- Level-up notifications: React to level changes
-RegisterMediatorEvent("OnParagonLevelChanged", OnParagonLevelChanged)
+Mediator.Register("OnParagonLevelChanged", OnParagonLevelChanged)
 
 print("[Paragon] Paragon Anniversary Experience module loaded")

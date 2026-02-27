@@ -70,6 +70,31 @@ OnLearnSpell = (event, player, spell_id) ->
         return
 RegisterPlayerEvent 44, OnLearnSpell
 
+--- Automatically learns mounts when the required skill rank is reached.
+--- Checks for skill ID 762 (Riding) and compares new skill rank to mount requirements
+--- @param event number Event ID (12 = PLAYER_EVENT_ON_UPDATE_SKILL)
+--- @param player Player The player updating the skill
+--- @param skill_id number The updated skill ID
+--- @param value number The new skill value
+--- @param max number The maximum skill value
+--- @param step number The skill step (0-4)
+--- @param new_value number The new skill value after the update
+OnUpdateSkill = (event, player, skill_id, value, max, step, new_value) ->
+    return unless skill_id == 762
+    ext = player\GetData "PlayerExtended"
+    return unless ext
+
+    account = ext\GetAccount!
+    return unless account
+
+    ObjectMgr = Game.ObjectMgr.GetInstance!
+
+    -- Sorted mounts by required skill rank, add newly available ones
+    sorted_mounts = ObjectMgr\GetSorted(ObjectMgr\GetMountList! or {}, (a, b) -> a.RequiredSkillRank < b.RequiredSkillRank)
+    for _, mount in pairs(sorted_mounts)
+        if mount.RequiredSkillRank <= new_value and not player:HasMount(mount.Spell)
+            player\LearnSpell(mount.Spell)
+
 --- Reloads PlayerExtended for all online players on Lua state open.
 --- @param event number Event ID (33 = SERVER_EVENT_ON_LUA_STATE_OPEN)
 OnLuaStateOpen = (event) ->

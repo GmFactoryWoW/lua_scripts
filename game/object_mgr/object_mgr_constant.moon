@@ -19,5 +19,13 @@ ObjectMgrConstant = {
         ITEM_TEMPLATE_MOUNT: {
             SELECT: "SELECT RequiredSkill, RequiredSkillRank, spellid_2 FROM item_template WHERE RequiredSkill = 762;"
         }
+        ACCOUNT_CURRENCY: {
+            SELECT: "SELECT `currency`, `count` FROM `acore_ale`.`account_currency` WHERE account = %d;"
+            INSERT: "INSERT INTO `acore_ale`.`account_currency` (`account`, `currency`, `count`) VALUES (%d, %d, %d) ON DUPLICATE KEY UPDATE `count` = %d;"
+            DELETE: "DELETE FROM `acore_ale`.`account_currency` WHERE `account` = %d;"
+        }
+        ITEM_TEMPLATE_CURRENCY: {
+            SELECT: "SELECT `entry` FROM `item_template` WHERE `BagFamily` = 8192;"
+        }
     }
 }

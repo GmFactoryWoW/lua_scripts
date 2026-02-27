@@ -83,7 +83,7 @@ class ObjectMgr
     MapMountItems: () =>
         @MountList = {}
 
-        WorldDBQueryAsync(Game.ObjectMgrConstant.QUERY.MOUNT_ITEMS, (results) ->
+        WorldDBQueryAsync(Game.ObjectMgrConstant.QUERY.MOUNT_ITEMS, (results, callback) ->
             if results
                 while true
                     row = results\GetRow!
@@ -93,8 +93,11 @@ class ObjectMgr
                         Spell: row.spellid_2
                     })
                     break unless results\NextRow!
+            callback(@MountList) if callback
         )
 
+    --- Returns the list of mounts with their required skill ranks.
+    --- @return table A list of mounts with RequiredSkillRank and Spell ID.
     GetMountList: => @MountList
 
     --- Retrieves data sorted by a custom function.
@@ -107,3 +110,45 @@ class ObjectMgr
             table.insert(sorted_list, item)
         table.sort(sorted_list, sorter)
         return sorted_list
+
+    --- Loads all currencies for a given account.
+    --- @param account_id number The account ID.
+    --- @param callback function
+    LoadAccountCurrencies: (account_id, callback) =>
+        CharDBQueryAsync(string.format(Game.ObjectMgrConstant.QUERY.ACCOUNT_CURRENCY.SELECT, account_id), (results) ->
+            data = {}
+            if results
+                while true
+                    row = results\GetRow!
+                    currency = row.currency
+                    count = row.count
+                    data[currency] = count
+                    break unless results\NextRow!
+            callback(data) if callback
+        )
+
+    --- Saves a currency for a given account.
+    --- @param account_id number The account ID.
+    --- @param currency number The currency ID.
+    --- @param count number The amount of the currency.
+    SaveAccountCurrency: (account_id, currency, count) =>
+        CharDBExecute(string.format(Game.ObjectMgrConstant.QUERY.ACCOUNT_CURRENCY.INSERT, account_id, currency, count, count))
+
+    --- Retrieves all currency items from the database.
+    --- @param callback function
+    LoadCurrencyItems: (callback) =>
+        @CurrencyList = {}
+        WorldDBQueryAsync(Game.ObjectMgrConstant.QUERY.ITEM_TEMPLATE_CURRENCY.SELECT, (results) ->
+            data = {}
+            if results
+                while true
+                    row = results\GetRow!
+                    entry = row.entry
+                    @CurrencyList[entry] = true
+                    break unless results\NextRow!
+            callback(@CurrencyList) if callback
+        )
+
+    --- Returns the list of currency items.
+    --- @return table A table where keys are currency item entries.
+    GetCurrencyList: => @CurrencyList

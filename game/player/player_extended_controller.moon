@@ -19,6 +19,13 @@ OnPlayerLogin = (event, player) ->
 
         pobject\SetData "PlayerExtended", player_extended
         Mediator\On "player:ready", pobject
+
+        -- Load account currencies and add to inventory
+        ObjectMgr = Game.ObjectMgr.GetInstance!
+        ObjectMgr\LoadAccountCurrencies account_id, (currencies) ->
+            for currency, count in pairs(currencies)
+                player\AddItem(currency, count)
+
 RegisterPlayerEvent 3, OnPlayerLogin
 
 --- Saves PlayerExtended data and cleans up on player logout.
@@ -31,6 +38,16 @@ OnPlayerLogout = (event, player) ->
     if ext
         ext\Save!
         player\SetData "PlayerExtended", nil
+
+        -- Save account currencies and remove from inventory
+        account_id = player\GetAccountId!
+        ObjectMgr = Game.ObjectMgr.GetInstance!
+
+        for currency, _ in ObjectMgr\GetCurrencyList!
+            if player\HasItem(currency)
+                count = player\GetItemCount(currency)
+                ObjectMgr\SaveAccountCurrency(account_id, currency, count)
+                player\RemoveItem(currency, count)
 RegisterPlayerEvent 4, OnPlayerLogout
 
 --- Deletes persistent player flags when a character is deleted.
@@ -94,6 +111,7 @@ OnUpdateSkill = (event, player, skill_id, value, max, step, new_value) ->
     for _, mount in pairs(sorted_mounts)
         if mount.RequiredSkillRank <= new_value and not player:HasMount(mount.Spell)
             player\LearnSpell(mount.Spell)
+RegisterPlayerEvent 62, OnUpdateSkill
 
 --- Reloads PlayerExtended for all online players on Lua state open.
 --- @param event number Event ID (33 = SERVER_EVENT_ON_LUA_STATE_OPEN)

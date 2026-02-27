@@ -77,3 +77,33 @@ class ObjectMgr
         if (not Instance)
             Instance = @!
         return Instance
+
+    --- Maps all items with RequiredSkill 762 and organizes them into a single MountList.
+    --- @return void
+    MapMountItems: () =>
+        @MountList = {}
+
+        WorldDBQueryAsync(Game.ObjectMgrConstant.QUERY.MOUNT_ITEMS, (results) ->
+            if results
+                while true
+                    row = results\GetRow!
+                    table.insert(@MountList, {
+                        RequiredSkill: row.RequiredSkill,
+                        RequiredSkillRank: row.RequiredSkillRank,
+                        Spell: row.spellid_2
+                    })
+                    break unless results\NextRow!
+        )
+
+    GetMountList: => @MountList
+
+    --- Retrieves data sorted by a custom function.
+    --- @param data table The data to sort.
+    --- @param sorter function The sorting function to apply.
+    --- @return table The sorted list.
+    GetSorted: (data, sorter) =>
+        sorted_list = {}
+        for _, item in pairs(data)
+            table.insert(sorted_list, item)
+        table.sort(sorted_list, sorter)
+        return sorted_list

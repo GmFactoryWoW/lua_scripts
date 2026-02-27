@@ -16,5 +16,8 @@ ObjectMgrConstant = {
             SELECT: "SELECT `companion` FROM `acore_ale`.`account_companion` WHERE account_id = %d;"
             INSERT: "INSERT IGNORE INTO `acore_ale`.`account_companion` VALUES (%d, %d);"
         }
+        ITEM_TEMPLATE_MOUNT: {
+            SELECT: "SELECT RequiredSkill, RequiredSkillRank, spellid_2 FROM item_template WHERE RequiredSkill = 762;"
+        }
     }
 }

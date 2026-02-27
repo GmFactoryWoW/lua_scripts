@@ -66,17 +66,17 @@ end
 ---
 function Mediator:On(eventName, params)
     params = params or {}
-    
+
     local args = params.arguments or {}
     local defaults = params.defaults or {}
-    
+
     -- No callbacks registered
     if not self.events[eventName] then
         return self:_UnpackDefaults(defaults)
     end
-    
+
     local allReturns = {}
-    
+
     -- Execute all callbacks
     for _, callback in ipairs(self.events[eventName]) do
         local success, result = pcall(callback, unpack(args))
@@ -86,12 +86,12 @@ function Mediator:On(eventName, params)
             error("Mediator: Error in callback for '" .. eventName .. "': " .. tostring(result))
         end
     end
-    
+
     -- Return merged results
     if #allReturns > 0 then
         return self:_MergeReturns(allReturns, defaults)
     end
-    
+
     return self:_UnpackDefaults(defaults)
 end
 
@@ -106,23 +106,23 @@ end
 ---
 function Mediator:_MergeReturns(allReturns, defaults)
     local maxReturnCount = #defaults
-    
+
     -- Find maximum return count
     for _, returns in ipairs(allReturns) do
         if #returns > maxReturnCount then
             maxReturnCount = #returns
         end
     end
-    
+
     if maxReturnCount == 0 then
         return nil
     end
-    
+
     local mergedReturns = {}
-    
+
     for i = 1, maxReturnCount do
         local value = nil
-        
+
         -- Find first non-nil value at this position
         for _, returns in ipairs(allReturns) do
             if returns[i] ~= nil then
@@ -130,15 +130,15 @@ function Mediator:_MergeReturns(allReturns, defaults)
                 break
             end
         end
-        
+
         -- Fallback to default if still nil
         if value == nil and defaults[i] ~= nil then
             value = defaults[i]
         end
-        
+
         mergedReturns[i] = value
     end
-    
+
     return unpack(mergedReturns)
 end
 
@@ -208,7 +208,7 @@ _G.Mediator = {
     On = function(eventName, params)
         return mediatorInstance:On(eventName, params)
     end,
-    
+
     ---
     --- Registers a callback.
     ---
@@ -219,7 +219,7 @@ _G.Mediator = {
     Register = function(eventName, callback)
         return mediatorInstance:Register(eventName, callback)
     end,
-    
+
     ---
     --- Clears callbacks for an event.
     ---
@@ -229,7 +229,7 @@ _G.Mediator = {
     Clear = function(eventName)
         return mediatorInstance:Clear(eventName)
     end,
-    
+
     ---
     --- Gets callback count for an event.
     ---

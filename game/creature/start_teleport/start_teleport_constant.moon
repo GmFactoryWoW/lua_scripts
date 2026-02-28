@@ -29,5 +29,5 @@ StartTeleportConstant = {
         SELECT: "SELECT DISTINCT `race`, `map`, `position_x`, `position_y`, `position_z`, `orientation` FROM `playercreateinfo` WHERE `class` != 6;"
     }
 
-    NPC_ENTRY: { ALLIANCE: 197, HORDE: 10176 }
+    NPC_ENTRY: { ALLIANCE: 600001, HORDE: 600000 }
 }

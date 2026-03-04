@@ -20,7 +20,9 @@ OnMediatorPlayerBeforeLogout = (player) ->
     account = player\GetAccount!
     return unless account
 
-    for currency_id, count in pairs account\GetCurrencies!
+    ObjectMgr = Game.ObjectMgr.GetInstance!
+
+    for currency_id, count in pairs ObjectMgr\GetCurrencyList!
         if player\HasItem currency_id
             count = player\GetItemCount currency_id
             account\SetCurrency currency_id, count

@@ -55,7 +55,7 @@ class PlayerExtended
         return @account
 
 -- Extend Player class with PlayerExtended methods
-INTERNAL = { __init: true, Load: true, Save: true }
+INTERNAL = { __init: true }
 for name, method in pairs(Game.PlayerExtended.__base)
     continue if type(method) != "function" or INTERNAL[name]
     Player[name] = (...) =>

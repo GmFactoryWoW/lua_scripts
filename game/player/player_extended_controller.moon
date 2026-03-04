@@ -18,23 +18,7 @@ export OnPlayerLogin = (event, player) ->
         return unless pobject
 
         pobject\SetData "PlayerExtended", player_extended
-        Mediator\On "player:ready", pobject
-
-        account = pobject\GetAccount!
-        return unless account
-
-        for companion, _ in pairs(account\GetCompanions!)
-            unless pobject\HasSpell companion
-                pobject\LearnSpell companion
-
-        for mount, _ in pairs(account\GetMounts!)
-            unless pobject\HasSpell mount
-                skill_value = pobject\GetSkillValue 762
-                OnPlayerUpdateSkill 62, pobject, 762, skill_value, skill_value, 0, skill_value
-
-        for currency, count in pairs(account\GetCurrencies!)
-            unless pobject\HasItem currency
-                pobject\AddItem currency, count
+        Mediator.On "player:ready", { arguments: { pobject } }
 RegisterPlayerEvent 3, OnPlayerLogin
 
 --- Saves PlayerExtended data and cleans up on player logout.
@@ -42,26 +26,16 @@ RegisterPlayerEvent 3, OnPlayerLogin
 --- @param event number Event ID (4 = PLAYER_EVENT_ON_LOGOUT)
 --- @param player Player The player logging out
 export OnPlayerLogout = (event, player) ->
-    Mediator\On "player:logout", player
-    ext = player\GetData "PlayerExtended"
-    if ext
-        ext\Save!
-        player\SetData "PlayerExtended", nil
+    Mediator.On "player:logout", { arguments: { player } }
+    player\Save!
 RegisterPlayerEvent 4, OnPlayerLogout
 
 --- Saves account currencies and removes them from inventory before logout.
---- Publishes "player:beforeLogout" before saving.
+--- Publishes "player:before_logout" before saving.
 --- @param event number Event ID (74 = PLAYER_EVENT_ON_BEFORE_LOGOUT)
 --- @param player Player The player about to log out
 export OnPlayerBeforeLogout = (event, player) ->
-    Mediator\On "player:beforeLogout", player
-    account = player\GetAccount!
-    if account
-        for currency_id, count in pairs(account\GetCurrencies!)
-            if player\HasItem currency_id
-                count = player\GetItemCount currency_id
-                account\SetCurrency currency_id, count
-                player\RemoveItem currency_id, count
+    Mediator.On "player:before_logout", { arguments: { player } }
 RegisterPlayerEvent 74, OnPlayerBeforeLogout
 
 --- Deletes persistent player flags when a character is deleted.
@@ -78,25 +52,21 @@ RegisterPlayerEvent 2, OnCharacterDelete
 --- @param player Player The player learning the spell
 --- @param spell_id number The learned spell ID
 OnPlayerLearnSpell = (event, player, spell_id) ->
-    ext = player\GetData "PlayerExtended"
-    return unless ext
-
-    account = ext\GetAccount!
-    return unless account
+    Mediator.On "player:learn_spell", { arguments: { player, spell_id } }
 
     spell_info = GetSpellInfo spell_id
     return unless spell_info
 
     -- Mount : Speed aura (32) + Mount aura (78)
     if spell_info\HasAura(32) and spell_info\HasAura(78)
-        unless account\HasMount spell_id
-            account\AddMount spell_id
+        Mediator.On "player:can_add_mount", { arguments: { player, spell_id } }
+        return
 
     -- Companion : MiscValueB == 41 + Effect 28
     effect_misc_value_b = spell_info\GetEffectMiscValueB 0
     if effect_misc_value_b == 41 and spell_info\HasEffect 28
-        unless account\HasCompanion spell_id
-            account\AddCompanion spell_id
+        Mediator.On "player:can_add_companion", { arguments: { player, spell_id } }
+        return
 RegisterPlayerEvent 44, OnPlayerLearnSpell
 
 --- Automatically learns mounts when the required skill rank is reached.
@@ -109,19 +79,12 @@ RegisterPlayerEvent 44, OnPlayerLearnSpell
 --- @param step number The skill step (0-4)
 --- @param new_value number The new skill value after the update
 export OnPlayerUpdateSkill = (event, player, skill_id, value, max, step, new_value) ->
+    Mediator.On "player:update_skill", { arguments: { player, skill_id, value, max, step, new_value } }
+
     return unless skill_id == 762
-    ext = player\GetData "PlayerExtended"
-    return unless ext
-
-    account = ext\GetAccount!
-    return unless account
-
     ObjectMgr = Game.ObjectMgr.GetInstance!
 
     -- Sorted mounts by required skill rank, add newly available ones
     sorted_mounts = ObjectMgr\GetSorted(ObjectMgr\GetMountList! or {}, (a, b) -> a.RequiredSkillRank < b.RequiredSkillRank)
-    for _, mount in pairs(sorted_mounts)
-        if mount.RequiredSkillRank <= new_value and (player\GetAccount!\HasMount(mount.Spell))
-            unless player\HasSpell mount.Spell
-                player\LearnSpell(mount.Spell)
+    Mediator.On "player:can_learn_mount", { arguments: { player, new_value, sorted_mounts } }
 RegisterPlayerEvent 62, OnPlayerUpdateSkill

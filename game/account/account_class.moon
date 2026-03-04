@@ -11,6 +11,7 @@ class Account
         @account_id = account_id
         @mount = {}
         @companion = {}
+        @currencies = {}
         @Load callback
 
     --- Loads mounts and companions in parallel from the database.
@@ -20,7 +21,7 @@ class Account
         loaded = 0
         onLoaded = ->
             loaded += 1
-            callback(@) if loaded == 2 and callback
+            callback(@) if loaded == 3 and callback
 
         object_mgr\LoadAccountMounts @account_id, (mounts) ->
             @mount = mounts
@@ -28,6 +29,10 @@ class Account
 
         object_mgr\LoadAccountCompanions @account_id, (companions) ->
             @companion = companions
+            onLoaded!
+
+        object_mgr\LoadAccountCurrencies @account_id, (currencies) ->
+            @currencies = currencies
             onLoaded!
 
     --- Adds a mount spell to the account if not already known.
@@ -82,6 +87,36 @@ class Account
     GetCompanions: =>
         return @companion
 
+    --- Sets a currency amount for the account.
+    --- @param currency_id number The currency item ID
+    --- @param count number The amount of currency
+    --- @return self
+    SetCurrency: (currency_id, count) =>
+        @currencies[currency_id] = count
+        return @
+
+    --- Removes a currency from the account.
+    --- @param currency_id number The currency item ID
+    --- @param count number The amount of currency to remove
+    --- @return self
+    RemoveCurrency: (currency_id, count) =>
+        if @currencies[currency_id]
+            @currencies[currency_id] = @currencies[currency_id] - count
+            if @currencies[currency_id] <= 0
+                @currencies[currency_id] = nil
+        return @
+
+    --- Checks whether the account has a specific currency.
+    --- @param currency_id number The currency item ID
+    --- @return boolean
+    HasCurrency: (currency_id) =>
+        return @currencies[currency_id] != nil
+
+    --- Returns the full currency collection.
+    --- @return table<number, number> Currency ID to count mapping
+    GetCurrencies: =>
+        return @currencies
+
     --- Persists all newly added mounts and companions to the database.
     Save: =>
         object_mgr = Game.ObjectMgr.GetInstance!
@@ -92,4 +127,7 @@ class Account
         for spell_id, flags in pairs(@companion)
             if flags == Game.AccountDataState.NEW_DATA
                 object_mgr\SaveAccountCompanion @account_id, spell_id
+
+        for currency_id, count in pairs(@currencies)
+            object_mgr\SaveAccountCurrency @account_id, currency_id, count
         return @

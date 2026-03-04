@@ -77,7 +77,7 @@ RegisterPlayerEvent 2, OnCharacterDelete
 --- @param event number Event ID (44 = PLAYER_EVENT_ON_LEARN_SPELL)
 --- @param player Player The player learning the spell
 --- @param spell_id number The learned spell ID
-OnLearnSpell = (event, player, spell_id) ->
+OnPlayerLearnSpell = (event, player, spell_id) ->
     ext = player\GetData "PlayerExtended"
     return unless ext
 
@@ -97,7 +97,7 @@ OnLearnSpell = (event, player, spell_id) ->
     if effect_misc_value_b == 41 and spell_info\HasEffect 28
         unless account\HasCompanion spell_id
             account\AddCompanion spell_id
-RegisterPlayerEvent 44, OnLearnSpell
+RegisterPlayerEvent 44, OnPlayerLearnSpell
 
 --- Automatically learns mounts when the required skill rank is reached.
 --- Checks for skill ID 762 (Riding) and compares new skill rank to mount requirements

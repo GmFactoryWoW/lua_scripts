@@ -24,7 +24,7 @@ OnPlayerLogin = (event, player) ->
         ObjectMgr = Game.ObjectMgr.GetInstance!
         ObjectMgr\LoadAccountCurrencies account_id, (currencies) ->
             for currency, count in pairs(currencies)
-                player\AddItem(currency, count)
+                pobject\AddItem(currency, count)
 
 RegisterPlayerEvent 3, OnPlayerLogin
 
@@ -42,12 +42,11 @@ OnPlayerLogout = (event, player) ->
         -- Save account currencies and remove from inventory
         account_id = player\GetAccountId!
         ObjectMgr = Game.ObjectMgr.GetInstance!
-
-        for currency, _ in ObjectMgr\GetCurrencyList!
+        for currency, _ in pairs ObjectMgr\GetCurrencyList!
             if player\HasItem(currency)
-                count = player\GetItemCount(currency)
-                ObjectMgr\SaveAccountCurrency(account_id, currency, count)
-                player\RemoveItem(currency, count)
+                count = player\GetItemCount currency
+                player\RemoveItem currency, count
+                ObjectMgr\SaveAccountCurrency account_id, currency, count
 RegisterPlayerEvent 4, OnPlayerLogout
 
 --- Deletes persistent player flags when a character is deleted.
@@ -117,6 +116,10 @@ RegisterPlayerEvent 62, OnUpdateSkill
 --- @param event number Event ID (33 = SERVER_EVENT_ON_LUA_STATE_OPEN)
 OnLuaStateOpen = (event) ->
     Game.StartTeleport.GetInstance!
+    ObjectMgr = Game.ObjectMgr.GetInstance!
+
+    ObjectMgr\LoadCurrencyItems!
+    ObjectMgr\MapMountItems!
 
     for _, player in pairs(GetPlayersInWorld!)
         OnPlayerLogin 3, player

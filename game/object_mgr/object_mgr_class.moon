@@ -80,10 +80,10 @@ class ObjectMgr
 
     --- Maps all items with RequiredSkill 762 and organizes them into a single MountList.
     --- @return void
-    MapMountItems: () =>
+    MapMountItems: (callback) =>
         @MountList = {}
 
-        WorldDBQueryAsync(Game.ObjectMgrConstant.QUERY.MOUNT_ITEMS, (results, callback) ->
+        WorldDBQueryAsync(Game.ObjectMgrConstant.QUERY.ITEM_TEMPLATE_MOUNT.SELECT, (results) ->
             if results
                 while true
                     row = results\GetRow!

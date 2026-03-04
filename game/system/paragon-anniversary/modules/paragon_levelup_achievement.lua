@@ -28,7 +28,7 @@ local Constants = require("paragon_constant")
 local sf = string.format
 
 local Achievements = {}
-local AchievementID = 70000
+local AchievementID = 5000
 
 -- ============================================================================
 -- ACHIEVEMENT TABLE INITIALIZATION

@@ -39,7 +39,8 @@ class ObjectMgr
             data = {}
             if results
                 while true
-                    spell_id = results\GetUInt32 0
+                    row = results\GetRow!
+                    spell_id = row.mount
                     data[spell_id] = Game.AccountDataState.OLD_DATA
                     break unless results\NextRow!
             callback(data) if callback
@@ -59,7 +60,8 @@ class ObjectMgr
             data = {}
             if results
                 while true
-                    spell_id = results\GetUInt32 0
+                    row = results\GetRow!
+                    spell_id = row.companion
                     data[spell_id] = Game.AccountDataState.OLD_DATA
                     break unless results\NextRow!
             callback(data) if callback

@@ -30,7 +30,7 @@ OnPlayerLogin = (event, player) ->
         for mount, _ in pairs(account\GetMounts!)
             unless pobject\HasSpell mount
                 skill_value = pobject\GetSkillValue 762
-                OnUpdateSkill 62, pobject, 762, skill_value, skill_value, 0, skill_value
+                OnPlayerUpdateSkill 62, pobject, 762, skill_value, skill_value, 0, skill_value
 
         for currency, count in pairs(account\GetCurrencies!)
             unless pobject\HasItem currency
@@ -109,7 +109,7 @@ RegisterPlayerEvent 44, OnLearnSpell
 --- @param max number The maximum skill value
 --- @param step number The skill step (0-4)
 --- @param new_value number The new skill value after the update
-OnUpdateSkill = (event, player, skill_id, value, max, step, new_value) ->
+export OnPlayerUpdateSkill = (event, player, skill_id, value, max, step, new_value) ->
     return unless skill_id == 762
     ext = player\GetData "PlayerExtended"
     return unless ext
@@ -122,9 +122,10 @@ OnUpdateSkill = (event, player, skill_id, value, max, step, new_value) ->
     -- Sorted mounts by required skill rank, add newly available ones
     sorted_mounts = ObjectMgr\GetSorted(ObjectMgr\GetMountList! or {}, (a, b) -> a.RequiredSkillRank < b.RequiredSkillRank)
     for _, mount in pairs(sorted_mounts)
-        if mount.RequiredSkillRank <= new_value and not player:HasMount(mount.Spell)
-            player\LearnSpell(mount.Spell)
-RegisterPlayerEvent 62, OnUpdateSkill
+        if mount.RequiredSkillRank <= new_value and (player\GetAccount!\HasMount(mount.Spell))
+            unless player\HasSpell mount.Spell
+                player\LearnSpell(mount.Spell)
+RegisterPlayerEvent 62, OnPlayerUpdateSkill
 
 --- Reloads PlayerExtended for all online players on Lua state open.
 --- @param event number Event ID (33 = SERVER_EVENT_ON_LUA_STATE_OPEN)

@@ -38,7 +38,12 @@ OnPlayerLogout = (event, player) ->
     if ext
         ext\Save!
         player\SetData "PlayerExtended", nil
+RegisterPlayerEvent 4, OnPlayerLogout
 
+OnPlayerBeforeLogout = (event, player) ->
+    Mediator\On "player:beforeLogout", player
+    ext = player\GetData "PlayerExtended"
+    if ext
         -- Save account currencies and remove from inventory
         account_id = player\GetAccountId!
         ObjectMgr = Game.ObjectMgr.GetInstance!
@@ -47,7 +52,8 @@ OnPlayerLogout = (event, player) ->
                 count = player\GetItemCount currency
                 player\RemoveItem currency, count
                 ObjectMgr\SaveAccountCurrency account_id, currency, count
-RegisterPlayerEvent 4, OnPlayerLogout
+
+RegisterPlayerEvent 74, OnPlayerBeforeLogout
 
 --- Deletes persistent player flags when a character is deleted.
 --- @param event number Event ID (2 = PLAYER_EVENT_ON_CHARACTER_DELETE)

@@ -6,7 +6,7 @@
 --- Publishes "player:ready" once all data is available.
 --- @param event number Event ID (3 = PLAYER_EVENT_ON_LOGIN)
 --- @param player Player The player logging in
-OnPlayerLogin = (event, player) ->
+export OnPlayerLogin = (event, player) ->
     guid_low = player\GetGUIDLow!
     account_id = player\GetAccountId!
 
@@ -41,7 +41,7 @@ RegisterPlayerEvent 3, OnPlayerLogin
 --- Publishes "player:logout" before saving.
 --- @param event number Event ID (4 = PLAYER_EVENT_ON_LOGOUT)
 --- @param player Player The player logging out
-OnPlayerLogout = (event, player) ->
+export OnPlayerLogout = (event, player) ->
     Mediator\On "player:logout", player
     ext = player\GetData "PlayerExtended"
     if ext
@@ -53,7 +53,7 @@ RegisterPlayerEvent 4, OnPlayerLogout
 --- Publishes "player:beforeLogout" before saving.
 --- @param event number Event ID (74 = PLAYER_EVENT_ON_BEFORE_LOGOUT)
 --- @param player Player The player about to log out
-OnPlayerBeforeLogout = (event, player) ->
+export OnPlayerBeforeLogout = (event, player) ->
     Mediator\On "player:beforeLogout", player
     account = player\GetAccount!
     if account
@@ -125,24 +125,3 @@ export OnPlayerUpdateSkill = (event, player, skill_id, value, max, step, new_val
             unless player\HasSpell mount.Spell
                 player\LearnSpell(mount.Spell)
 RegisterPlayerEvent 62, OnPlayerUpdateSkill
-
---- Reloads PlayerExtended for all online players on Lua state open.
---- @param event number Event ID (33 = SERVER_EVENT_ON_LUA_STATE_OPEN)
-OnLuaStateOpen = (event) ->
-    Game.StartTeleport.GetInstance!
-    ObjectMgr = Game.ObjectMgr.GetInstance!
-
-    ObjectMgr\LoadCurrencyItems!
-    ObjectMgr\MapMountItems!
-
-    for _, player in pairs(GetPlayersInWorld!)
-        OnPlayerLogin 3, player
-RegisterServerEvent 33, OnLuaStateOpen
-
---- Saves PlayerExtended for all online players on Lua state close.
---- @param event number Event ID (16 = SERVER_EVENT_ON_LUA_STATE_CLOSE)
-OnLuaStateClose = (event) ->
-    for _, player in pairs(GetPlayersInWorld!)
-        OnPlayerBeforeLogout 74, player
-        OnPlayerLogout 4, player
-RegisterServerEvent 16, OnLuaStateClose

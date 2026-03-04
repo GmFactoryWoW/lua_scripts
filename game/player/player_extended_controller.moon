@@ -94,7 +94,6 @@ OnLearnSpell = (event, player, spell_id) ->
 
     -- Companion : MiscValueB == 41 + Effect 28
     effect_misc_value_b = spell_info\GetEffectMiscValueB 0
-    print effect_misc_value_b == 41 and spell_info\HasEffect 28
     if effect_misc_value_b == 41 and spell_info\HasEffect 28
         unless account\HasCompanion spell_id
             account\AddCompanion spell_id

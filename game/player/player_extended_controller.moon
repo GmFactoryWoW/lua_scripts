@@ -20,12 +20,21 @@ OnPlayerLogin = (event, player) ->
         pobject\SetData "PlayerExtended", player_extended
         Mediator\On "player:ready", pobject
 
-        -- Load account currencies and add to inventory
-        ObjectMgr = Game.ObjectMgr.GetInstance!
-        ObjectMgr\LoadAccountCurrencies account_id, (currencies) ->
-            for currency, count in pairs(currencies)
-                pobject\AddItem(currency, count)
+        account = pobject\GetAccount!
+        return unless account
 
+        for companion, _ in pairs(account\GetCompanions!)
+            unless pobject\HasSpell companion
+                pobject\LearnSpell companion
+
+        for mount, _ in pairs(account\GetMounts!)
+            unless pobject\HasSpell mount
+                skill_value = pobject\GetSkillValue 762
+                OnUpdateSkill 62, pobject, 762, skill_value, skill_value, 0, skill_value
+
+        for currency, count in pairs(account\GetCurrencies!)
+            unless pobject\HasItem currency
+                pobject\AddItem currency, count
 RegisterPlayerEvent 3, OnPlayerLogin
 
 --- Saves PlayerExtended data and cleans up on player logout.
@@ -40,19 +49,19 @@ OnPlayerLogout = (event, player) ->
         player\SetData "PlayerExtended", nil
 RegisterPlayerEvent 4, OnPlayerLogout
 
+--- Saves account currencies and removes them from inventory before logout.
+--- Publishes "player:beforeLogout" before saving.
+--- @param event number Event ID (74 = PLAYER_EVENT_ON_BEFORE_LOGOUT)
+--- @param player Player The player about to log out
 OnPlayerBeforeLogout = (event, player) ->
     Mediator\On "player:beforeLogout", player
-    ext = player\GetData "PlayerExtended"
-    if ext
-        -- Save account currencies and remove from inventory
-        account_id = player\GetAccountId!
-        ObjectMgr = Game.ObjectMgr.GetInstance!
-        for currency, _ in pairs ObjectMgr\GetCurrencyList!
-            if player\HasItem(currency)
-                count = player\GetItemCount currency
-                player\RemoveItem currency, count
-                ObjectMgr\SaveAccountCurrency account_id, currency, count
-
+    account = player\GetAccount!
+    if account
+        for currency_id, count in pairs(account\GetCurrencies!)
+            if player\HasItem currency_id
+                count = player\GetItemCount currency_id
+                account\SetCurrency currency_id, count
+                player\RemoveItem currency_id, count
 RegisterPlayerEvent 74, OnPlayerBeforeLogout
 
 --- Deletes persistent player flags when a character is deleted.
@@ -82,14 +91,13 @@ OnLearnSpell = (event, player, spell_id) ->
     if spell_info\HasAura(32) and spell_info\HasAura(78)
         unless account\HasMount spell_id
             account\AddMount spell_id
-        return
 
     -- Companion : MiscValueB == 41 + Effect 28
     effect_misc_value_b = spell_info\GetEffectMiscValueB 0
-    if effect_misc_value_b == 41 and spell_info\HasEffect(28)
+    print effect_misc_value_b == 41 and spell_info\HasEffect 28
+    if effect_misc_value_b == 41 and spell_info\HasEffect 28
         unless account\HasCompanion spell_id
             account\AddCompanion spell_id
-        return
 RegisterPlayerEvent 44, OnLearnSpell
 
 --- Automatically learns mounts when the required skill rank is reached.
@@ -135,5 +143,6 @@ RegisterServerEvent 33, OnLuaStateOpen
 --- @param event number Event ID (16 = SERVER_EVENT_ON_LUA_STATE_CLOSE)
 OnLuaStateClose = (event) ->
     for _, player in pairs(GetPlayersInWorld!)
+        OnPlayerBeforeLogout 74, player
         OnPlayerLogout 4, player
 RegisterServerEvent 16, OnLuaStateClose

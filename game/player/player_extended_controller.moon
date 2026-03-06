@@ -71,7 +71,7 @@ RegisterPlayerEvent 44, OnPlayerLearnSpell
 
 --- Automatically learns mounts when the required skill rank is reached.
 --- Checks for skill ID 762 (Riding) and compares new skill rank to mount requirements
---- @param event number Event ID (12 = PLAYER_EVENT_ON_UPDATE_SKILL)
+--- @param event number Event ID (62 = PLAYER_EVENT_ON_UPDATE_SKILL)
 --- @param player Player The player updating the skill
 --- @param skill_id number The updated skill ID
 --- @param value number The new skill value

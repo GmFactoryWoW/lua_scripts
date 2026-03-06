@@ -7,6 +7,9 @@
 --- @param event number Event ID (3 = PLAYER_EVENT_ON_LOGIN)
 --- @param player Player The player logging in
 export OnPlayerLogin = (event, player) ->
+    if (player\IsBot!)
+        return
+
     guid_low = player\GetGUIDLow!
     account_id = player\GetAccountId!
 
@@ -26,6 +29,9 @@ RegisterPlayerEvent 3, OnPlayerLogin
 --- @param event number Event ID (4 = PLAYER_EVENT_ON_LOGOUT)
 --- @param player Player The player logging out
 export OnPlayerLogout = (event, player) ->
+    if (player\IsBot!)
+        return
+
     Mediator.On "player:logout", { arguments: { player } }
     player\Save!
 RegisterPlayerEvent 4, OnPlayerLogout
@@ -35,6 +41,9 @@ RegisterPlayerEvent 4, OnPlayerLogout
 --- @param event number Event ID (74 = PLAYER_EVENT_ON_BEFORE_LOGOUT)
 --- @param player Player The player about to log out
 export OnPlayerBeforeLogout = (event, player) ->
+    if (player\IsBot!)
+        return
+
     Mediator.On "player:before_logout", { arguments: { player } }
 RegisterPlayerEvent 74, OnPlayerBeforeLogout
 
@@ -42,6 +51,9 @@ RegisterPlayerEvent 74, OnPlayerBeforeLogout
 --- @param event number Event ID (2 = PLAYER_EVENT_ON_CHARACTER_DELETE)
 --- @param guid number The deleted character's GUID
 OnCharacterDelete = (event, guid) ->
+    if (player\IsBot!)
+        return
+
     Game.ObjectMgr.GetInstance!\DeletePlayerFlags guid
 RegisterPlayerEvent 2, OnCharacterDelete
 
@@ -52,6 +64,9 @@ RegisterPlayerEvent 2, OnCharacterDelete
 --- @param player Player The player learning the spell
 --- @param spell_id number The learned spell ID
 OnPlayerLearnSpell = (event, player, spell_id) ->
+    if (player\IsBot!)
+        return
+
     Mediator.On "player:learn_spell", { arguments: { player, spell_id } }
 
     spell_info = GetSpellInfo spell_id
@@ -79,6 +94,9 @@ RegisterPlayerEvent 44, OnPlayerLearnSpell
 --- @param step number The skill step (0-4)
 --- @param new_value number The new skill value after the update
 export OnPlayerUpdateSkill = (event, player, skill_id, value, max, step, new_value) ->
+    if (player\IsBot!)
+        return
+
     Mediator.On "player:update_skill", { arguments: { player, skill_id, value, max, step, new_value } }
 
     return unless skill_id == 762

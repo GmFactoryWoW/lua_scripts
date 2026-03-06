@@ -20,7 +20,7 @@ OnMediatorPlayerReady = (player) ->
             when Game.ObjectMgrConstant.ENUM.CURRENCY_TYPE.GOLD
                 player\SetCoinage count
             else
-                player\AddItem currency_key, count
+                player\AddItem currency_key, count, false
 Mediator.Register "player:ready", OnMediatorPlayerReady
 
 OnMediatorPlayerBeforeLogout = (player) ->

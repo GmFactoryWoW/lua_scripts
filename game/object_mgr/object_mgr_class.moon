@@ -114,27 +114,26 @@ class ObjectMgr
         return sorted_list
 
     --- Loads all currencies for a given account.
+    --- Keys are either item IDs (positive) or special types: HONOR=-1, ARENA=-2, GOLD=-3.
     --- @param account_id number The account ID.
-    --- @param callback function
+    --- @param callback function Called with (data: table<number, number>)
     LoadAccountCurrencies: (account_id, callback) =>
         CharDBQueryAsync(string.format(Game.ObjectMgrConstant.QUERY.ACCOUNT_CURRENCY.SELECT, account_id), (results) ->
             data = {}
             if results
                 while true
                     row = results\GetRow!
-                    currency = row.currency
-                    count = row.count
-                    data[currency] = count
+                    data[row.currency] = row.count
                     break unless results\NextRow!
             callback(data) if callback
         )
 
     --- Saves a currency for a given account.
     --- @param account_id number The account ID.
-    --- @param currency number The currency ID.
+    --- @param currency_id number The currency key (item ID or special type: -1/-2/-3).
     --- @param count number The amount of the currency.
-    SaveAccountCurrency: (account_id, currency, count) =>
-        CharDBExecute(string.format(Game.ObjectMgrConstant.QUERY.ACCOUNT_CURRENCY.INSERT, account_id, currency, count, count))
+    SaveAccountCurrency: (account_id, currency_id, count) =>
+        CharDBExecute(string.format(Game.ObjectMgrConstant.QUERY.ACCOUNT_CURRENCY.INSERT, account_id, currency_id, count, count))
 
     --- Retrieves all currency items from the database.
     --- @param callback function

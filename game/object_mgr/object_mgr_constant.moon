@@ -28,4 +28,13 @@ ObjectMgrConstant = {
             SELECT: "SELECT `entry` FROM `item_template` WHERE `BagFamily` = 8192;"
         }
     }
+
+    ENUM: {
+        CURRENCY_TYPE: {
+            NORMAL: 0
+            HONOR: -1
+            ARENA: -2
+            GOLD: -3
+        }
+    }
 }

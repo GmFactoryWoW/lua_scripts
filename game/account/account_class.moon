@@ -88,32 +88,33 @@ class Account
         return @companion
 
     --- Sets a currency amount for the account.
-    --- @param currency_id number The currency item ID
+    --- Key is either an item ID (positive) or a special type: HONOR=-1, ARENA=-2, GOLD=-3.
+    --- @param currency_key number The currency key (item ID or special type)
     --- @param count number The amount of currency
     --- @return self
-    SetCurrency: (currency_id, count) =>
-        @currencies[currency_id] = count
+    SetCurrency: (currency_key, count) =>
+        @currencies[currency_key] = count
         return @
 
-    --- Removes a currency from the account.
-    --- @param currency_id number The currency item ID
-    --- @param count number The amount of currency to remove
+    --- Removes a currency amount from the account.
+    --- @param currency_key number The currency key (item ID or special type)
+    --- @param count number The amount to remove
     --- @return self
-    RemoveCurrency: (currency_id, count) =>
-        if @currencies[currency_id]
-            @currencies[currency_id] = @currencies[currency_id] - count
-            if @currencies[currency_id] <= 0
-                @currencies[currency_id] = nil
+    RemoveCurrency: (currency_key, count) =>
+        if @currencies[currency_key]
+            @currencies[currency_key] = @currencies[currency_key] - count
+            if @currencies[currency_key] <= 0
+                @currencies[currency_key] = nil
         return @
 
     --- Checks whether the account has a specific currency.
-    --- @param currency_id number The currency item ID
+    --- @param currency_key number The currency key (item ID or special type)
     --- @return boolean
-    HasCurrency: (currency_id) =>
-        return @currencies[currency_id] != nil
+    HasCurrency: (currency_key) =>
+        return @currencies[currency_key] != nil
 
     --- Returns the full currency collection.
-    --- @return table<number, number> Currency ID to count mapping
+    --- @return table<number, number> Currency key to count mapping
     GetCurrencies: =>
         return @currencies
 
@@ -128,6 +129,6 @@ class Account
             if flags == Game.AccountDataState.NEW_DATA
                 object_mgr\SaveAccountCompanion @account_id, spell_id
 
-        for currency_id, count in pairs(@currencies)
-            object_mgr\SaveAccountCurrency @account_id, currency_id, count
+        for currency_key, count in pairs(@currencies)
+            object_mgr\SaveAccountCurrency @account_id, currency_key, count
         return @

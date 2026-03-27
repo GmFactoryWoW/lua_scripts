@@ -382,9 +382,10 @@ return {
         --- Aura-based Bonuses
         -- Custom aura IDs for special bonuses like loot, reputation, and experience
         AURA = {
-            LOOT                    = 1900000,
-            REPUTATION              = 1900001,
-            EXPERIENCE              = 1900002
+            EXPERIENCE              = 200000,
+            REPUTATION              = 200001,
+            MOVE_SPEED              = 200002,
+            GOLD                    = 200003,
         }
     }
 }

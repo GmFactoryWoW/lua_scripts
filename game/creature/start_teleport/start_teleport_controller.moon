@@ -21,6 +21,9 @@ PlayerChoice_OnReceiveTeleportChoice = (player, args_table) ->
     return false if player\HasFlag Game.PlayerFlags.TELEPORT_USED
     return false unless args_table and args_table[1]
 
+    player_level = player\GetLevel!
+    return false if (player_level > 1)
+
     chosen_race = args_table[1]
 
     if player\IsAlliance!
@@ -61,6 +64,11 @@ Controller.OnPlayerGossipHello = (event, player, object) ->
     available_locations = Game.StartTeleport.GetInstance!\GetAvailableDestinationsByRaceMask player\GetRaceMask!
     if next(available_locations) == nil
         player\SendNotification "Erreur interne! Merci de contacter un administrateur."
+    else
+    
+    player_level = player\GetLevel!
+    if (player_level > 1)
+        player\SendNotification "Vous avez déjà dépassé le niveau 1, vous ne pouvez plus choisir votre lieu de départ."
     else
         Controller.BuildAddonMessage player, available_locations
 

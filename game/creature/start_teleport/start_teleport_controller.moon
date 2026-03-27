@@ -65,12 +65,11 @@ Controller.OnPlayerGossipHello = (event, player, object) ->
     if next(available_locations) == nil
         player\SendNotification "Erreur interne! Merci de contacter un administrateur."
     else
-    
-    player_level = player\GetLevel!
-    if (player_level > 1)
-        player\SendNotification "Vous avez déjà dépassé le niveau 1, vous ne pouvez plus choisir votre lieu de départ."
-    else
-        Controller.BuildAddonMessage player, available_locations
+        player_level = player\GetLevel!
+        if (player_level > 1)
+            player\SendNotification "Vous avez déjà dépassé le niveau 1, vous ne pouvez plus choisir votre lieu de départ."
+        else
+            Controller.BuildAddonMessage player, available_locations
 
     player\GossipComplete!
 RegisterCreatureGossipEvent Game.StartTeleportConstant.NPC_ENTRY.ALLIANCE, 1, Controller.OnPlayerGossipHello

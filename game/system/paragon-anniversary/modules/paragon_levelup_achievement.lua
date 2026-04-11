@@ -75,13 +75,13 @@ _InitAchievementTable()
 local function OnParagonLevelChanged(player, _, old_level, new_level)
     if new_level > old_level then
         for level = 10, 100, 10 do
-            if new_level >= level and Achievements[new_level] and and not player:HasAchieved(Achievements[level]) then
+            if new_level >= level and Achievements[new_level] and not player:HasAchieved(Achievements[level]) then
                 player:SetAchievement(Achievements[level])
             end
         end
 
         for level = 125, 500, 25 do
-            if new_level >= level and Achievements[new_level] and and not player:HasAchieved(Achievements[level]) then
+            if new_level >= level and Achievements[new_level] and not player:HasAchieved(Achievements[level]) then
                 player:SetAchievement(Achievements[level])
             end
         end

@@ -638,24 +638,59 @@ end
 --- @param player The player object that killed the creature
 --- @param creature The creature object that was killed
 ---
-function Hook.OnPlayerKillCreature(event, player, creature)
-    if not player or not creature then
-        return
+local function GiveParagonExp(target, sourceEntry)
+    if not target then return end
+    local paragon = target:GetData("Paragon")
+    if paragon then
+        UpdatePlayerExperience(target, paragon, EXPERIENCE_SOURCE.CREATURE, sourceEntry or 0)
     end
-
-    local paragon = player:GetData("Paragon")
-    if not paragon then
-        return
-    end
-
-    -- Allow modules to intercept creature experience gain
-    paragon = Mediator.On("OnBeforeCreatureExperience", {
-        arguments = { player, creature, paragon },
-        defaults = { paragon },
-    })
-
-    UpdatePlayerExperience(player, paragon, EXPERIENCE_SOURCE.CREATURE, creature:GetEntry())
 end
+
+local function DistributeExp(player, unit)
+    if not player or not unit then return end
+
+    local group = player:GetGroup()
+    local entry = (unit.GetEntry and unit:GetEntry()) or 0
+
+    if group then
+        local members = group:GetMembers()
+        for _, member in ipairs(members) do
+            if member and member:IsAlive() and member:IsWithinDistInMap(unit, 80) then
+                GiveParagonExp(member, entry)
+            end
+        end
+    else
+        GiveParagonExp(player, entry)
+    end
+end
+
+function Hook.OnPlayerKillCreature(event, player, creature)
+    if not player or not creature then return end
+
+    local pLevel = player:GetLevel()
+    local cLevel = creature:GetLevel() or 0
+    local greyLevel = (pLevel <= 5) and 0 or (pLevel <= 39 and (pLevel - math.floor(pLevel/10) - 5) or (pLevel - math.floor(pLevel/5) - 1))
+
+    if (cLevel > greyLevel) then
+        if creature:IsDamageEnoughForLootingAndReward() then
+            DistributeExp(player, creature)
+        end
+    end
+end
+
+function Hook.OnPlayerKillPlayer(event, killer, victim)
+    if not killer or not victim or killer == victim then return end
+
+    local kLevel = killer:GetLevel()
+    local vLevel = victim:GetLevel()
+    local greyLevel = (kLevel <= 5) and 0 or (kLevel <= 39 and (kLevel - math.floor(kLevel/10) - 5) or (kLevel - math.floor(kLevel/5) - 1))
+
+    if vLevel > greyLevel then
+        DistributeExp(killer, victim)
+    end
+end
+
+RegisterPlayerEvent(6, Hook.OnPlayerKillPlayer)
 
 ---
 --- Handles achievement complete event.

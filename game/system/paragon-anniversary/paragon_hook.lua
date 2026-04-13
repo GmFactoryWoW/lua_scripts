@@ -125,12 +125,20 @@ local function UpdatePlayerStatistics(player, paragon, apply)
         elseif stat_data.type == "COMBAT_RATING" then
             player:ApplyRatingMod(constant_stat_type[stat_data.value], stat_value, apply)
         elseif stat_data.type == "AURA" then
+            local spellId = constant_stat_type[stat_data.value]
+
             if apply then
-                for _ = 1, stat_value do
-                    player:AddAura(constant_stat_type[stat_data.value], player)
+                local aura = player:GetAura(spellId)
+
+                if not aura then
+                    aura = player:AddAura(spellId, player)
+                end
+
+                if aura then
+                    aura:SetStackAmount(stat_value)
                 end
             else
-                player:RemoveAura(constant_stat_type[stat_data.value])
+                player:RemoveAura(spellId)
             end
         end
 

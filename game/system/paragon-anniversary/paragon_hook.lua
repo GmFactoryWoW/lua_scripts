@@ -37,8 +37,7 @@ local Hook = {
         Prefix = "ParagonAnniversary",
         Functions = {
             [1] = "OnParagonClientLoadRequest",
-            [2] = "OnParagonClientSendStatistics",
-            [6] = "OnParagonClientRequestTargetLevel"
+            [2] = "OnParagonClientSendStatistics"
         }
     }
 }

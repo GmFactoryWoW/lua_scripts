@@ -21,15 +21,15 @@ local function OnAfterMigrationExecute(_)
     ))
 end
 
-/*
-DELETE FROM `creature_template` WHERE `entry` = 600002;
-INSERT INTO `creature_template` (`entry`, `difficulty_entry_1`, `difficulty_entry_2`, `difficulty_entry_3`, `KillCredit1`, `KillCredit2`, `name`, `subname`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `exp`, `faction`, `npcflag`, `speed_walk`, `speed_run`, `speed_swim`, `speed_flight`, `detection_range`, `rank`, `dmgschool`, `DamageModifier`, `BaseAttackTime`, `RangeAttackTime`, `BaseVariance`, `RangeVariance`, `unit_class`, `unit_flags`, `unit_flags2`, `dynamicflags`, `family`, `type`, `type_flags`, `lootid`, `pickpocketloot`, `skinloot`, `PetSpellDataId`, `VehicleId`, `mingold`, `maxgold`, `AIName`, `MovementType`, `HoverHeight`, `HealthModifier`, `ManaModifier`, `ArmorModifier`, `ExperienceModifier`, `RacialLeader`, `movementId`, `RegenHealth`, `flags_extra`, `ScriptName`, `VerifiedBuild`) VALUES
-(600002, 0, 0, 0, 0, 0, 'Orakel des Échos', 'Purificateur des chemins Paragon', 'Interact', 0, 1, 1, 0, 35, 1, 1, 1.14286, 1, 1, 20, 0, 0, 1, 0, 0, 1, 1, 1, 6, 32768, 0, 0, 0, 1611661328, 0, 0, 0, 0, 0, 0, 0, '', 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, '', NULL);
 
-DELETE FROM `creature_template_model` WHERE `CreatureID` = 600002;
-INSERT INTO `creature_template_model` (`CreatureID`, `Idx`, `CreatureDisplayID`, `DisplayScale`, `Probability`, `VerifiedBuild`) VALUES
-(600002, 0, 18303, 1, 1, NULL);
-*/
+-- DELETE FROM `creature_template` WHERE `entry` = 600002;
+-- INSERT INTO `creature_template` (`entry`, `difficulty_entry_1`, `difficulty_entry_2`, `difficulty_entry_3`, `KillCredit1`, `KillCredit2`, `name`, `subname`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `exp`, `faction`, `npcflag`, `speed_walk`, `speed_run`, `speed_swim`, `speed_flight`, `detection_range`, `rank`, `dmgschool`, `DamageModifier`, `BaseAttackTime`, `RangeAttackTime`, `BaseVariance`, `RangeVariance`, `unit_class`, `unit_flags`, `unit_flags2`, `dynamicflags`, `family`, `type`, `type_flags`, `lootid`, `pickpocketloot`, `skinloot`, `PetSpellDataId`, `VehicleId`, `mingold`, `maxgold`, `AIName`, `MovementType`, `HoverHeight`, `HealthModifier`, `ManaModifier`, `ArmorModifier`, `ExperienceModifier`, `RacialLeader`, `movementId`, `RegenHealth`, `flags_extra`, `ScriptName`, `VerifiedBuild`) VALUES
+-- (600002, 0, 0, 0, 0, 0, 'Orakel des Échos', 'Purificateur des chemins Paragon', 'Interact', 0, 1, 1, 0, 35, 1, 1, 1.14286, 1, 1, 20, 0, 0, 1, 0, 0, 1, 1, 1, 6, 32768, 0, 0, 0, 1611661328, 0, 0, 0, 0, 0, 0, 0, '', 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, '', NULL);
+
+-- DELETE FROM `creature_template_model` WHERE `CreatureID` = 600002;
+-- INSERT INTO `creature_template_model` (`CreatureID`, `Idx`, `CreatureDisplayID`, `DisplayScale`, `Probability`, `VerifiedBuild`) VALUES
+-- (600002, 0, 18303, 1, 1, NULL);
+
 
 local function GetResetNpcEntry()
     return tonumber(Config:GetByField("PARAGON_RESET_NPC_ENTRY")) or 0

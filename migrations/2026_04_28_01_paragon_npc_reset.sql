@@ -1,1 +1,1 @@
-INSERT IGNORE INTO paragon_config (field, value) VALUES ('PARAGON_RESET_NPC_ENTRY', '600002');
+INSERT IGNORE INTO `acore_ale`.`paragon_config` (field, value) VALUES ('PARAGON_RESET_NPC_ENTRY', '600002');

@@ -1,0 +1,1 @@
+INSERT IGNORE INTO paragon_config (field, value) VALUES ('PARAGON_RESET_NPC_ENTRY', '600002');

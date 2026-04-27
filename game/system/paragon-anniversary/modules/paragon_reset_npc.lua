@@ -16,10 +16,20 @@ local ADDON_PREFIX = "ParagonAnniversary"
 
 local function OnAfterMigrationExecute(_)
     CharDBExecute(sf(
-        "INSERT IGNORE INTO %s.paragon_config (field, value) VALUES ('PARAGON_RESET_NPC_ENTRY', '0');",
+        "INSERT IGNORE INTO %s.paragon_config (field, value) VALUES ('PARAGON_RESET_NPC_ENTRY', '600002');",
         Constants.DB_NAME
     ))
 end
+
+/*
+DELETE FROM `creature_template` WHERE `entry` = 600002;
+INSERT INTO `creature_template` (`entry`, `difficulty_entry_1`, `difficulty_entry_2`, `difficulty_entry_3`, `KillCredit1`, `KillCredit2`, `name`, `subname`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `exp`, `faction`, `npcflag`, `speed_walk`, `speed_run`, `speed_swim`, `speed_flight`, `detection_range`, `rank`, `dmgschool`, `DamageModifier`, `BaseAttackTime`, `RangeAttackTime`, `BaseVariance`, `RangeVariance`, `unit_class`, `unit_flags`, `unit_flags2`, `dynamicflags`, `family`, `type`, `type_flags`, `lootid`, `pickpocketloot`, `skinloot`, `PetSpellDataId`, `VehicleId`, `mingold`, `maxgold`, `AIName`, `MovementType`, `HoverHeight`, `HealthModifier`, `ManaModifier`, `ArmorModifier`, `ExperienceModifier`, `RacialLeader`, `movementId`, `RegenHealth`, `flags_extra`, `ScriptName`, `VerifiedBuild`) VALUES
+(600002, 0, 0, 0, 0, 0, 'Orakel des Échos', 'Purificateur des chemins Paragon', 'Interact', 0, 1, 1, 0, 35, 1, 1, 1.14286, 1, 1, 20, 0, 0, 1, 0, 0, 1, 1, 1, 6, 32768, 0, 0, 0, 1611661328, 0, 0, 0, 0, 0, 0, 0, '', 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, '', NULL);
+
+DELETE FROM `creature_template_model` WHERE `CreatureID` = 600002;
+INSERT INTO `creature_template_model` (`CreatureID`, `Idx`, `CreatureDisplayID`, `DisplayScale`, `Probability`, `VerifiedBuild`) VALUES
+(600002, 0, 18303, 1, 1, NULL);
+*/
 
 local function GetResetNpcEntry()
     return tonumber(Config:GetByField("PARAGON_RESET_NPC_ENTRY")) or 0
@@ -58,7 +68,7 @@ local function ResetParagonPoints(player)
 
     -- Reset mémoire + BDD.
     paragon:ResetStatistics()
-    Repository:DeleteParagonCharacterStats(paragon:GetGuid())
+    Repository:DeleteParagonCharacterStats(player:GetGUIDLow())
 
     -- Sauvegarde l'état propre.
     paragon:Save()

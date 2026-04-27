@@ -15,9 +15,8 @@ local GOSSIP_ACTION_RESET = 1
 local ADDON_PREFIX = "ParagonAnniversary"
 
 local function OnAfterMigrationExecute(_)
-    -- Insert default spell ID for level-up animation (Spell ID: 64785)
     CharDBExecute(sf(
-        "INSERT IGNORE INTO %s.paragon_config (field, value) VALUES ('PARAGON_RESET_NPC_ENTRY', '64785');",
+        "INSERT IGNORE INTO %s.paragon_config (field, value) VALUES ('PARAGON_RESET_NPC_ENTRY', '0');",
         Constants.DB_NAME
     ))
 end
@@ -100,5 +99,11 @@ if npc_entry > 0 then
     RegisterCreatureGossipEvent(npc_entry, 1, ResetNpc.OnGossipHello)
     RegisterCreatureGossipEvent(npc_entry, 2, ResetNpc.OnGossipSelect)
 end
+
+-- ============================================================================
+-- MODULE INITIALIZATION
+-- ============================================================================
+
+print("[Paragon] Paragon Anniversary Reset NPC module loaded")
 
 return ResetNpc

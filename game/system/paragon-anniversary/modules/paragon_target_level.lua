@@ -18,9 +18,7 @@
 -- MODULE CONFIGURATION
 -- ============================================================================
 local ParagonHook = require("paragon_hook")
-ParagonHook.Addon.Functions[6] = "OnParagonClientRequestTargetLevel"
-
-RegisterClientRequests(ParagonHook.Addon, true)
+ParagonHook.RegisterAddonFunction(6, "OnParagonClientRequestTargetLevel")
 
 -- ============================================================================
 -- SERVER HOOK HANDLERS

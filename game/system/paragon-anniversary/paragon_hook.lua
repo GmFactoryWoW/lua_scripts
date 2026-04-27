@@ -42,6 +42,35 @@ local Hook = {
     }
 }
 
+function Hook.RegisterAddonFunction(id, name)
+    if not id or not name then
+        error("[Paragon] RegisterAddonFunction: id and name are required")
+        return
+    end
+
+    if type(id) ~= "number" then
+        error("[Paragon] RegisterAddonFunction: id must be a number")
+        return
+    end
+
+    if type(name) ~= "string" then
+        error("[Paragon] RegisterAddonFunction: name must be a string")
+        return
+    end
+
+    if Hook.Addon.Functions[id] ~= nil then
+        error(string.format(
+            "[Paragon] RegisterAddonFunction: ID %d already used by '%s'",
+            id,
+            tostring(Hook.Addon.Functions[id])
+        ))
+        return
+    end
+
+    Hook.Addon.Functions[id] = name
+    RegisterClientRequests(Hook.Addon, true)
+end
+
 -- Experience source type enumeration
 local EXPERIENCE_SOURCE = {
     CREATURE = 1,
@@ -421,9 +450,12 @@ function OnParagonClientSendStatistics(player, arg_table)
     -- Temporarily remove all stat bonuses during processing
     UpdatePlayerStatistics(player, paragon, false)
 
-    -- Process each statistic update
+    -- Validate all statistic updates first, then apply decreases before increases.
+    -- This allows moving points from one stat to another in a single validation.
+    local decreases = {}
+    local increases = {}
+
     for _, updated_data in pairs(data) do
-        -- Validate category
         local category_id = updated_data.categoryId
         if not category_id then
             UpdatePlayerStatistics(player, paragon, true)
@@ -437,7 +469,6 @@ function OnParagonClientSendStatistics(player, arg_table)
             return false
         end
 
-        -- Validate statistic
         local statistic_id = updated_data.statId
         if not statistic_id then
             UpdatePlayerStatistics(player, paragon, true)
@@ -450,7 +481,6 @@ function OnParagonClientSendStatistics(player, arg_table)
             return false
         end
 
-        -- Validate value and limit
         local statistic_value = updated_data.value
         if not statistic_value or statistic_value < 0 then
             UpdatePlayerStatistics(player, paragon, true)
@@ -462,19 +492,48 @@ function OnParagonClientSendStatistics(player, arg_table)
             return false
         end
 
-        -- Allow modules to intercept before stat change (for additional validation/modification)
+        local current_value = paragon:GetStatValue(statistic_id)
+
+        if statistic_value <= current_value then
+            table.insert(decreases, updated_data)
+        else
+            table.insert(increases, updated_data)
+        end
+    end
+
+    local function ApplyStatisticUpdate(updated_data)
+        local statistic_id = updated_data.statId
+        local statistic_value = updated_data.value
+
         paragon, statistic_id, statistic_value = Mediator.On("OnBeforeStatisticChange", {
             arguments = { player, paragon, statistic_id, statistic_value },
             defaults = { paragon, statistic_id, statistic_value },
         })
 
-        -- Apply the stat change
-        UpdateParagonPoints(player, paragon, statistic_id, statistic_value)
+        local success = UpdateParagonPoints(player, paragon, statistic_id, statistic_value)
+        if not success then
+            return false
+        end
 
-        -- Allow modules to hook after stat change (for side effects, logging, etc.)
         Mediator.On("OnAfterStatisticChange", {
             arguments = { player, paragon, statistic_id, statistic_value },
         })
+
+        return true
+    end
+
+    for _, updated_data in pairs(decreases) do
+        if not ApplyStatisticUpdate(updated_data) then
+            UpdatePlayerStatistics(player, paragon, true)
+            return false
+        end
+    end
+
+    for _, updated_data in pairs(increases) do
+        if not ApplyStatisticUpdate(updated_data) then
+            UpdatePlayerStatistics(player, paragon, true)
+            return false
+        end
     end
 
     player:SetData("Paragon", paragon)
@@ -674,6 +733,11 @@ end
 
 function Hook.OnPlayerKillCreature(event, player, creature)
     if not player or not creature then return end
+
+    -- Exclude critters
+    if creature.GetCreatureType and creature:GetCreatureType() == 8 then
+        return
+    end
 
     local pLevel = player:GetLevel()
     local cLevel = creature:GetLevel() or 0

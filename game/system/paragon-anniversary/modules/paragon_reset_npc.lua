@@ -52,6 +52,8 @@ local function ResetParagonPoints(player)
     -- Reset mémoire + BDD.
     paragon:ResetStatistics()
     Repository:DeleteParagonCharacterStats(player:GetGUIDLow())
+    paragon:Save()
+    player:SetData("Paragon", paragon)
 
     -- Sauvegarde l'état propre.
     paragon:Save()
@@ -142,6 +144,17 @@ local npc_entry = GetResetNpcEntry()
 if npc_entry > 0 then
     RegisterCreatureGossipEvent(npc_entry, 1, ResetNpc.OnGossipHello)
     RegisterCreatureGossipEvent(npc_entry, 2, ResetNpc.OnGossipSelect)
+end
+
+local OriginalOnParagonClientLoadRequest = OnParagonClientLoadRequest
+
+OnParagonClientLoadRequest = function(player, arg_table)
+    local result = OriginalOnParagonClientLoadRequest(player, arg_table)
+
+    local enabled = GetResetNpcEntry() > 0 and 1 or 0
+    player:SendServerResponse(ADDON_PREFIX, 7, enabled)
+
+    return result
 end
 
 -- ============================================================================

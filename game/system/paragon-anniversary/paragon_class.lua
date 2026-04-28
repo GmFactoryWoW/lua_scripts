@@ -550,8 +550,21 @@ end
 --- @return self For method chaining
 ---
 function Paragon:ResetStatistics()
+    local previous_statistics = self.statistics or {}
+
+    for stat_id, previous_value in pairs(previous_statistics) do
+        if previous_value and previous_value > 0 then
+            if Mediator then
+                Mediator.On("OnParagonStatChanged", {
+                    arguments = { self, stat_id, previous_value, 0 }
+                })
+            end
+        end
+    end
+
     self.statistics = {}
     RecalculateAvailablePoints(self)
+
     return self
 end
 

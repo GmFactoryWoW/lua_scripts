@@ -70,13 +70,20 @@ end
 
 function ResetNpc.OnGossipHello(event, player, creature)
     player:GossipClearMenu()
-    player:GossipMenuAddItem(
-        GOSSIP_ICON_CHAT,
-        "Je souhaite réinitialiser mes points Paragon Anniversary",
-        GOSSIP_SENDER_MAIN,
-        GOSSIP_ACTION_RESET
-    )
-    player:GossipSendMenu(GetResetNpcEntry(), creature)
+
+    local requiredLevel = tonumber(Config:GetByField("PARAGON_STARTING_LEVEL")) or 1
+
+    if player:GetLevel() >= requiredLevel then
+        player:GossipMenuAddItem(
+            GOSSIP_ICON_CHAT,
+            "Je souhaite réinitialiser mes points Paragon Anniversary",
+            GOSSIP_SENDER_MAIN,
+            GOSSIP_ACTION_RESET
+        )
+        player:GossipSendMenu(GetResetNpcEntry(), creature)
+    else
+        player:GossipSendMenu(GetResetNpcEntry()+1, creature)
+    end
 end
 
 function ResetNpc.OnGossipSelect(event, player, creature, sender, intid, code, menu_id)

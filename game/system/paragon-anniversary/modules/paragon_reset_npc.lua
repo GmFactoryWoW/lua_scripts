@@ -95,6 +95,49 @@ function ResetNpc.OnGossipSelect(event, player, creature, sender, intid, code, m
     player:GossipComplete()
 end
 
+local OriginalOnParagonClientSendStatistics = OnParagonClientSendStatistics
+OnParagonClientSendStatistics = function(player, arg_table)
+    if GetResetNpcEntry() <= 0 then
+        return OriginalOnParagonClientSendStatistics(player, arg_table)
+    end
+
+    if not player or not arg_table or not arg_table[1] then
+        return OriginalOnParagonClientSendStatistics(player, arg_table)
+    end
+
+    local paragon = player:GetData("Paragon")
+    if not paragon then
+        return OriginalOnParagonClientSendStatistics(player, arg_table)
+    end
+
+    local data = arg_table[1]
+
+    for _, updated_data in pairs(data) do
+        local statistic_id = updated_data.statId
+        local statistic_value = tonumber(updated_data.value)
+
+        if statistic_id and statistic_value then
+            local current_value = paragon:GetStatValue(statistic_id)
+
+            if statistic_value < current_value then
+                player:SendNotification("Vous devez vous adresser à l'Orakel des Échos pour réinitialiser vos points Paragon.")
+
+                player:SendServerResponse(ADDON_PREFIX, 4, paragon:GetPoints())
+
+                player:SendServerResponse(ADDON_PREFIX, 5, {
+                    id = statistic_id,
+                    value = current_value,
+                    category = Config:GetCategoryByStatId(statistic_id)
+                })
+
+                return false
+            end
+        end
+    end
+
+    return OriginalOnParagonClientSendStatistics(player, arg_table)
+end
+
 local npc_entry = GetResetNpcEntry()
 if npc_entry > 0 then
     RegisterCreatureGossipEvent(npc_entry, 1, ResetNpc.OnGossipHello)

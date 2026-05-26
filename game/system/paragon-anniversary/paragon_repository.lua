@@ -448,6 +448,14 @@ function Repository:DeleteParagonData(guid)
     CharDBExecute(sf(Constants.QUERY.DEL_PARA_STAT, Constants.DB_NAME, guid))
 end
 
+function Repository:DeleteParagonCharacterStats(guid)
+    if not guid then
+        return
+    end
+
+    CharDBExecute(sf(Constants.QUERY.DEL_PARA_STAT, Constants.DB_NAME, guid))
+end
+
 -- ============================================================================
 -- SINGLETON MANAGEMENT
 -- ============================================================================

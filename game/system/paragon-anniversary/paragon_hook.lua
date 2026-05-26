@@ -963,4 +963,6 @@ RegisterServerEvent(33, Hook.OnLuaStateOpen)
 -- Addon Communication Events
 RegisterClientRequests(Hook.Addon)
 
+Hook.UpdatePlayerStatistics = UpdatePlayerStatistics
+
 return Hook
